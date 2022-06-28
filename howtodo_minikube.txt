@@ -1,0 +1,104 @@
+cd D:\Estudio\Python\WeatherAPI\app\code
+
+https://www.metricfire.com/blog/develop-and-deploy-a-python-api-with-kubernetes-and-docker/
+https://dev.to/swarnimwalavalkar/build-and-deploy-a-rest-api-microservice-with-python-flask-and-docker-5c2d
+
+1. Install python:
+​-> python --version​
+-> Install:
+download and isntall https://www.python.org/
+
+2. install pip (https://www.liquidweb.com/kb/install-pip-windows/)
+-> check pip is not installed: pip help
+-> install if not installed: (run in console)
+
+python get-pip.py
+
+-> check installation: pip -V  ,  pip help
+
+3. install the virtual env:
+​pip install virtualenv​
+
+4. Create folder structure
+
+mkdir app
+cd app
+python3 -m venv vnev
+. venv/bin/activate   (en windows: vnev\Scripts\activate.bat)
+mkdir code
+cd code
+touch app.py
+
+5. dependencies
+pip install flask requests​
+pip freeze > requirements.txt
+
+* add code:
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return 'App Works!'
+    
+@app.route('/getdata')
+def getdata():
+
+    return 'this is the data '
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
+
+
+* add dockerfile
+FROM python:3
+ENV PYTHONUNBUFFERED 1
+RUN mkdir /app
+WORKDIR /app
+COPY requirements.txt /app
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+COPY . /app
+EXPOSE 5000
+CMD [ "python", "app.py" ]
+
+
+
+6. docker:
+docker build -t weather:v1 .
+docker images
+docker run -dit --rm -p 5000:5000 --name weather weather:v3
+docker ps
+"http://127.0.0.1:5000/"
+
+
+7. docker hub
+https://programatically.com/how-to-upload-docker-image-to-docker-hub/
+docker login
+docker tag weather:v1 walonsor/weather:1
+docker images
+docker push walonsor/weather:1
+
+8. minikube
+cmd1 -> minikube start
+cmd2 -> minikube dashboard
+cmd1 -> kubectl create deployment hello-node --image=walonsor/weather:3
+		kubectl expose deployment hello-node --type=LoadBalancer --port=8080
+		# minikube service hello-node
+		minikube tunnel
+		kubectl delete service hello-node
+		kubectl delete deployment hello-node
+		minikube stop
+		minikube delete
+		
+http://127.0.0.1:8080/getdata
+		
+Estos son algunos links que yo utilice:
+Instalar kubernetes:  https://kubernetes.io/docs/tasks/tools/  (en mi caso use minikube, recuerden que tambien pueden utilizar algun servicio cloud, por ejemplo AKS)
+Ejemplo en kubernetes: https://kubernetes.io/docs/tutorials/hello-minikube/  (es un ejemplo sencillo para desplegar una imagen en kubernetes con pocos pasos)
+
+
+
+
+
+
